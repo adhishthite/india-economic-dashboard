@@ -3,14 +3,21 @@
 import { CPIChart, GDPChart, IIPChart, WPIChart } from "@/components/charts";
 import { Header, type TabId } from "@/components/header";
 import { SummaryCards } from "@/components/summary-cards";
-import { cpiData, gdpData, iipData, summaryStats, wpiData } from "@/lib/mock-data";
+import { ChartSkeleton, StatCardSkeleton } from "@/components/ui/skeleton";
+import type {
+  CPIDataPoint,
+  GDPDataPoint,
+  IIPDataPoint,
+  SummaryStats,
+  WPIDataPoint,
+} from "@/lib/types";
 import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const sectionDescriptions: Record<TabId, { title: string; subtitle: string }> = {
   overview: {
     title: "Key Economic Indicators",
-    subtitle: "Real-time data from the Ministry of Statistics and Programme Implementation (MoSPI)",
+    subtitle: "Live data from the Ministry of Statistics and Programme Implementation (MoSPI)",
   },
   gdp: {
     title: "Gross Domestic Product",
@@ -30,8 +37,68 @@ const sectionDescriptions: Record<TabId, { title: string; subtitle: string }> = 
   },
 };
 
+interface DashboardData {
+  gdp: GDPDataPoint[] | null;
+  cpi: CPIDataPoint[] | null;
+  wpi: WPIDataPoint[] | null;
+  iip: IIPDataPoint[] | null;
+  summary: SummaryStats | null;
+}
+
+async function fetchDataset<T>(endpoint: string): Promise<T | null> {
+  try {
+    const res = await fetch(endpoint);
+    if (!res.ok) return null;
+    const json = await res.json();
+    return json.data ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function ErrorBanner({ message }: { message: string }) {
+  return (
+    <div className="glass-card rounded-2xl p-6 text-center">
+      <p className="text-sm text-slate-500 dark:text-slate-400">{message}</p>
+    </div>
+  );
+}
+
 export default function Home() {
   const [activeTab, setActiveTab] = useState<TabId>("overview");
+  const [data, setData] = useState<DashboardData>({
+    gdp: null,
+    cpi: null,
+    wpi: null,
+    iip: null,
+    summary: null,
+  });
+  const [loading, setLoading] = useState(true);
+  const [lastUpdated, setLastUpdated] = useState<string | null>(null);
+
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    const [gdp, cpi, wpi, iip, summary] = await Promise.all([
+      fetchDataset<GDPDataPoint[]>("/api/gdp"),
+      fetchDataset<CPIDataPoint[]>("/api/cpi"),
+      fetchDataset<WPIDataPoint[]>("/api/wpi"),
+      fetchDataset<IIPDataPoint[]>("/api/iip"),
+      fetchDataset<SummaryStats>("/api/summary"),
+    ]);
+    setData({ gdp, cpi, wpi, iip, summary });
+    setLastUpdated(
+      new Date().toLocaleDateString("en-IN", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
+    );
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const showChart = (chart: TabId) => activeTab === "overview" || activeTab === chart;
 
@@ -59,7 +126,18 @@ export default function Home() {
         {/* Summary Cards - visible on overview */}
         {activeTab === "overview" && (
           <section className="mb-10">
-            <SummaryCards stats={summaryStats} />
+            {loading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <StatCardSkeleton />
+                <StatCardSkeleton />
+                <StatCardSkeleton />
+                <StatCardSkeleton />
+              </div>
+            ) : data.summary ? (
+              <SummaryCards stats={data.summary} />
+            ) : (
+              <ErrorBanner message="Summary data temporarily unavailable" />
+            )}
           </section>
         )}
 
@@ -68,36 +146,72 @@ export default function Home() {
           <div className="space-y-6">
             {showChart("gdp") && (
               <section key="gdp">
-                <GDPChart data={gdpData} />
+                {loading ? (
+                  <ChartSkeleton />
+                ) : data.gdp && data.gdp.length > 0 ? (
+                  <GDPChart data={data.gdp} />
+                ) : (
+                  <ErrorBanner message="GDP data temporarily unavailable" />
+                )}
               </section>
             )}
 
             {activeTab === "overview" && (
               <div key="cpi-wpi-grid" className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                 <section>
-                  <CPIChart data={cpiData} />
+                  {loading ? (
+                    <ChartSkeleton />
+                  ) : data.cpi && data.cpi.length > 0 ? (
+                    <CPIChart data={data.cpi} />
+                  ) : (
+                    <ErrorBanner message="CPI data temporarily unavailable" />
+                  )}
                 </section>
                 <section>
-                  <WPIChart data={wpiData} />
+                  {loading ? (
+                    <ChartSkeleton />
+                  ) : data.wpi && data.wpi.length > 0 ? (
+                    <WPIChart data={data.wpi} />
+                  ) : (
+                    <ErrorBanner message="WPI data temporarily unavailable" />
+                  )}
                 </section>
               </div>
             )}
 
             {activeTab === "cpi" && (
               <section key="cpi-full">
-                <CPIChart data={cpiData} />
+                {loading ? (
+                  <ChartSkeleton />
+                ) : data.cpi && data.cpi.length > 0 ? (
+                  <CPIChart data={data.cpi} />
+                ) : (
+                  <ErrorBanner message="CPI data temporarily unavailable" />
+                )}
               </section>
             )}
 
             {activeTab === "wpi" && (
               <section key="wpi-full">
-                <WPIChart data={wpiData} />
+                {loading ? (
+                  <ChartSkeleton />
+                ) : data.wpi && data.wpi.length > 0 ? (
+                  <WPIChart data={data.wpi} />
+                ) : (
+                  <ErrorBanner message="WPI data temporarily unavailable" />
+                )}
               </section>
             )}
 
             {showChart("iip") && (
               <section key="iip">
-                <IIPChart data={iipData} />
+                {loading ? (
+                  <ChartSkeleton />
+                ) : data.iip && data.iip.length > 0 ? (
+                  <IIPChart data={data.iip} />
+                ) : (
+                  <ErrorBanner message="IIP data temporarily unavailable" />
+                )}
               </section>
             )}
           </div>
@@ -129,18 +243,11 @@ export default function Home() {
                 </a>
               </span>
               <span className="hidden sm:inline">|</span>
-              <span className="hidden sm:inline">
-                Updated{" "}
-                {new Date().toLocaleDateString("en-IN", {
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric",
-                })}
-              </span>
+              {lastUpdated && <span className="hidden sm:inline">Fetched {lastUpdated}</span>}
             </div>
           </div>
           <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-4 text-center leading-relaxed">
-            Sample data for demonstration purposes. For official statistics, visit{" "}
+            Live data from the MoSPI API. For official statistics, visit{" "}
             <a
               href="https://mospi.gov.in/"
               target="_blank"
