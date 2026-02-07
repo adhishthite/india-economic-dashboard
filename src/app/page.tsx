@@ -2,8 +2,8 @@
 
 import { CPIChart, GDPChart, IIPChart, WPIChart } from "@/components/charts";
 import { Header, type TabId } from "@/components/header";
+import { ChartSkeleton, DashboardSkeleton } from "@/components/skeletons";
 import { SummaryCards } from "@/components/summary-cards";
-import { ChartSkeleton, StatCardSkeleton } from "@/components/ui/skeleton";
 import type {
   CPIDataPoint,
   GDPDataPoint,
@@ -123,99 +123,95 @@ export default function Home() {
           </p>
         </motion.div>
 
-        {/* Summary Cards - visible on overview */}
-        {activeTab === "overview" && (
-          <section className="mb-10">
-            {loading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <StatCardSkeleton />
-                <StatCardSkeleton />
-                <StatCardSkeleton />
-                <StatCardSkeleton />
-              </div>
-            ) : data.summary ? (
-              <SummaryCards stats={data.summary} />
-            ) : (
-              <ErrorBanner message="Summary data temporarily unavailable" />
-            )}
-          </section>
-        )}
-
-        {/* Charts */}
-        <AnimatePresence mode="wait">
-          <div className="space-y-6">
-            {showChart("gdp") && (
-              <section key="gdp">
-                {loading ? (
-                  <ChartSkeleton />
-                ) : data.gdp && data.gdp.length > 0 ? (
-                  <GDPChart data={data.gdp} />
-                ) : (
-                  <ErrorBanner message="GDP data temporarily unavailable" />
-                )}
-              </section>
-            )}
-
+        {/* Full-page skeleton for overview while loading */}
+        {loading && activeTab === "overview" ? (
+          <DashboardSkeleton />
+        ) : (
+          <>
+            {/* Summary Cards - visible on overview */}
             {activeTab === "overview" && (
-              <div key="cpi-wpi-grid" className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                <section>
-                  {loading ? (
-                    <ChartSkeleton />
-                  ) : data.cpi && data.cpi.length > 0 ? (
-                    <CPIChart data={data.cpi} />
-                  ) : (
-                    <ErrorBanner message="CPI data temporarily unavailable" />
-                  )}
-                </section>
-                <section>
-                  {loading ? (
-                    <ChartSkeleton />
-                  ) : data.wpi && data.wpi.length > 0 ? (
-                    <WPIChart data={data.wpi} />
-                  ) : (
-                    <ErrorBanner message="WPI data temporarily unavailable" />
-                  )}
-                </section>
+              <section className="mb-10">
+                {data.summary ? (
+                  <SummaryCards stats={data.summary} />
+                ) : (
+                  <ErrorBanner message="Summary data temporarily unavailable" />
+                )}
+              </section>
+            )}
+
+            {/* Charts */}
+            <AnimatePresence mode="wait">
+              <div className="space-y-6">
+                {showChart("gdp") && (
+                  <section key="gdp">
+                    {loading ? (
+                      <ChartSkeleton />
+                    ) : data.gdp && data.gdp.length > 0 ? (
+                      <GDPChart data={data.gdp} />
+                    ) : (
+                      <ErrorBanner message="GDP data temporarily unavailable" />
+                    )}
+                  </section>
+                )}
+
+                {activeTab === "overview" && (
+                  <div key="cpi-wpi-grid" className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                    <section>
+                      {data.cpi && data.cpi.length > 0 ? (
+                        <CPIChart data={data.cpi} />
+                      ) : (
+                        <ErrorBanner message="CPI data temporarily unavailable" />
+                      )}
+                    </section>
+                    <section>
+                      {data.wpi && data.wpi.length > 0 ? (
+                        <WPIChart data={data.wpi} />
+                      ) : (
+                        <ErrorBanner message="WPI data temporarily unavailable" />
+                      )}
+                    </section>
+                  </div>
+                )}
+
+                {activeTab === "cpi" && (
+                  <section key="cpi-full">
+                    {loading ? (
+                      <ChartSkeleton />
+                    ) : data.cpi && data.cpi.length > 0 ? (
+                      <CPIChart data={data.cpi} />
+                    ) : (
+                      <ErrorBanner message="CPI data temporarily unavailable" />
+                    )}
+                  </section>
+                )}
+
+                {activeTab === "wpi" && (
+                  <section key="wpi-full">
+                    {loading ? (
+                      <ChartSkeleton />
+                    ) : data.wpi && data.wpi.length > 0 ? (
+                      <WPIChart data={data.wpi} />
+                    ) : (
+                      <ErrorBanner message="WPI data temporarily unavailable" />
+                    )}
+                  </section>
+                )}
+
+                {showChart("iip") && (
+                  <section key="iip">
+                    {loading ? (
+                      <ChartSkeleton />
+                    ) : data.iip && data.iip.length > 0 ? (
+                      <IIPChart data={data.iip} />
+                    ) : (
+                      <ErrorBanner message="IIP data temporarily unavailable" />
+                    )}
+                  </section>
+                )}
               </div>
-            )}
-
-            {activeTab === "cpi" && (
-              <section key="cpi-full">
-                {loading ? (
-                  <ChartSkeleton />
-                ) : data.cpi && data.cpi.length > 0 ? (
-                  <CPIChart data={data.cpi} />
-                ) : (
-                  <ErrorBanner message="CPI data temporarily unavailable" />
-                )}
-              </section>
-            )}
-
-            {activeTab === "wpi" && (
-              <section key="wpi-full">
-                {loading ? (
-                  <ChartSkeleton />
-                ) : data.wpi && data.wpi.length > 0 ? (
-                  <WPIChart data={data.wpi} />
-                ) : (
-                  <ErrorBanner message="WPI data temporarily unavailable" />
-                )}
-              </section>
-            )}
-
-            {showChart("iip") && (
-              <section key="iip">
-                {loading ? (
-                  <ChartSkeleton />
-                ) : data.iip && data.iip.length > 0 ? (
-                  <IIPChart data={data.iip} />
-                ) : (
-                  <ErrorBanner message="IIP data temporarily unavailable" />
-                )}
-              </section>
-            )}
-          </div>
-        </AnimatePresence>
+            </AnimatePresence>
+          </>
+        )}
 
         {/* Footer */}
         <footer className="mt-16 pt-8 border-t border-slate-200/60 dark:border-slate-700/30">
