@@ -16,8 +16,42 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "India Economic Dashboard | MoSPI Data",
   description:
-    "Real-time Indian economic indicators from the Ministry of Statistics and Programme Implementation",
-  keywords: ["India", "GDP", "CPI", "WPI", "IIP", "economic indicators", "MoSPI"],
+    "Track India's key economic indicators - GDP, CPI, WPI, IIP - with real-time data from the Ministry of Statistics and Programme Implementation.",
+  keywords: [
+    "India",
+    "GDP",
+    "CPI",
+    "WPI",
+    "IIP",
+    "economic indicators",
+    "MoSPI",
+    "Indian economy",
+    "inflation",
+    "industrial production",
+  ],
+  authors: [{ name: "India Economic Dashboard" }],
+  openGraph: {
+    title: "India Economic Dashboard",
+    description:
+      "Track India's key economic indicators - GDP, CPI, WPI, IIP - with real-time data from MoSPI.",
+    type: "website",
+    locale: "en_IN",
+    siteName: "India Economic Dashboard",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "India Economic Dashboard",
+    description:
+      "Track India's key economic indicators - GDP, CPI, WPI, IIP - with real-time data from MoSPI.",
+  },
+  icons: {
+    icon: [
+      {
+        url: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>",
+        type: "image/svg+xml",
+      },
+    ],
+  },
 };
 
 export default function RootLayout({
