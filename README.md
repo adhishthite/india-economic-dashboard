@@ -6,6 +6,9 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue?logo=typescript)](https://www.typescriptlang.org/)
 [![MoSPI MCP](https://img.shields.io/badge/Data-MoSPI%20MCP-orange)](https://mcp.mospi.gov.in/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-▶_Vercel-black?logo=vercel)](https://india-economic-dashboard.vercel.app)
+
+🔗 **Live Demo:** [india-economic-dashboard.vercel.app](https://india-economic-dashboard.vercel.app)
 
 ![Dashboard Preview](screenshot.png)
 
