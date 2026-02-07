@@ -135,7 +135,7 @@ src/
 **Adhish Thite**
 
 - GitHub: [@adhishthite](https://github.com/adhishthite)
-- LinkedIn: [adhishthite](https://www.linkedin.com/in/adhishthite)
+- LinkedIn: [adhish-thite](https://linkedin.com/in/adhish-thite)
 - Twitter: [@xadhish](https://x.com/xadhish)
 
 ## License
